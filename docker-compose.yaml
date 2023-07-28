@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  laravel:
+    build:
+      dockerfile: Dockerfile
+    container_name: laravel
+    restart: unless-stopped
+    depends_on: [ db, mailhog ]
+    volumes:
+      - "./www:/var/www/laravel"
+      - "./.bashrc:/root/.bashrc:ro"
+      - "./000-default.conf:/etc/apache2/sites-available/000-default.conf:ro"
+    ports:
+      - "2180:80"
+
+  mailhog:
+    image: mailhog/mailhog
+    logging:
+      driver: 'none'  # disable saving logs
+    ports:
+      - "1025:1025" # smtp server
+      - "8025:8025" # web ui
+
+  db:
+    image: mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: yes
+      MYSQL_USER: app_development
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: laravel
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: unless-stopped
+    depends_on: [ db ]
+    ports:
+      - "2188:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: app_development
+      PMA_PASSWORD: password
+
+volumes:
+  db_data:
