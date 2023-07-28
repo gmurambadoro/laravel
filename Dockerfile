@@ -14,4 +14,8 @@ RUN docker-php-ext-install pdo pdo_mysql bcmath \
 # install composer
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
+# install nodejs
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - &&\
+    apt-get install -y nodejs
+
 EXPOSE 80
